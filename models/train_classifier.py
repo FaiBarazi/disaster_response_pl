@@ -1,8 +1,13 @@
 import sys
 
+import nltk
+from nltk.tokenize import word_tokenize
+from nltk.stem import WordNetLemmatizer
 from pandas import pd
 from sklearn.model_selection import train_test_split
 from sqlalchemy import create_engine
+
+nltk.download(['punkt', 'wordnet', 'averaged_perceptron_tagger'])
 
 
 def load_data(table_name, database_filepath):
@@ -14,7 +19,12 @@ def load_data(table_name, database_filepath):
 
 
 def tokenize(text):
-    pass
+    tokens = word_tokenize(text)
+    lammetizer = WordNetLemmatizer()
+    cleaned_tokens = [
+        lammetizer.lemmatize(tok).lower().strip() for tok in tokens
+    ]
+    return cleaned_tokens
 
 
 def build_model():
