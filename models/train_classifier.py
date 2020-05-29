@@ -1,9 +1,16 @@
 import sys
+
+from pandas import pd
 from sklearn.model_selection import train_test_split
+from sqlalchemy import create_engine
 
 
-def load_data(database_filepath):
-    pass
+def load_data(table_name, database_filepath):
+    engine = create_engine(database_filepath)
+    df = pd.read_sql_table(table_name, con=engine)
+    X = df['message']
+    y = df.drop(columns=['message', 'original', 'id', 'genre'])
+    return X, y
 
 
 def tokenize(text):
@@ -25,7 +32,7 @@ def save_model(model, model_filepath):
 def main():
     if len(sys.argv) == 3:
         database_filepath, model_filepath = sys.argv[1:]
-        print('Loading data...\n    DATABASE: {}'.format(database_filepath))
+        print(f'Loading data...\n    DATABASE: {database_filepath}')
         X, Y, category_names = load_data(database_filepath)
         X_train, X_test, Y_train, Y_test = train_test_split(X, Y, test_size=0.2)
 
@@ -38,7 +45,7 @@ def main():
         print('Evaluating model...')
         evaluate_model(model, X_test, Y_test, category_names)
 
-        print('Saving model...\n    MODEL: {}'.format(model_filepath))
+        print(f'Saving model...\n    MODEL: {(model_filepath)}')
         save_model(model, model_filepath)
 
         print('Trained model saved!')
