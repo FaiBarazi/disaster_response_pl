@@ -6,6 +6,7 @@ from nltk.stem import WordNetLemmatizer
 from pandas import pd
 from sklearn.ensemble import RandomForestClassifier
 from sklearn.feature_extraction.text import CountVectorizer, TfidfTransformer
+from sklearn.metrics import classification_report
 from sklearn.model_selection import train_test_split
 from sklearn.multioutput import MultiOutputClassifier
 from sklearn.pipeline import Pipeline
@@ -19,7 +20,8 @@ def load_data(table_name, database_filepath):
     df = pd.read_sql_table(table_name, con=engine)
     X = df['message']
     y = df.drop(columns=['message', 'original', 'id', 'genre'])
-    return X, y
+    category_names = list(y.columns)
+    return X, y, category_names
 
 
 def tokenize(text):
@@ -41,7 +43,15 @@ def build_model():
 
 
 def evaluate_model(model, X_test, Y_test, category_names):
-    pass
+    y_hat = model.predict(X_test)
+
+    for i, clmn in enumerate(category_names):
+        print(
+            classification_report(
+                Y_test.iloc[:, i].values, y_hat[:, i],
+                target_names=[clmn]
+                )
+            )
 
 
 def save_model(model, model_filepath):
