@@ -11,7 +11,7 @@ nltk.download(['punkt', 'wordnet', 'averaged_perceptron_tagger'])
 
 
 def load_data(table_name, database_filepath):
-    engine = create_engine(database_filepath)
+    engine = create_engine(f'sqlite:///{database_filepath}')
     df = pd.read_sql_table(table_name, con=engine)
     X = df['message']
     y = df.drop(columns=['message', 'original', 'id', 'genre'])
