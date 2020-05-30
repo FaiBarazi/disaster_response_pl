@@ -1,4 +1,5 @@
 import sys
+import string
 
 import nltk
 from nltk.tokenize import word_tokenize
@@ -22,7 +23,7 @@ def tokenize(text):
     tokens = word_tokenize(text)
     lammetizer = WordNetLemmatizer()
     cleaned_tokens = [
-        lammetizer.lemmatize(tok).lower().strip() for tok in tokens
+        lammetizer.lemmatize(tok).lower().strip().strip(string.punctuation) for tok in tokens
     ]
     return cleaned_tokens
 
