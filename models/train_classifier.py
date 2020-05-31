@@ -1,6 +1,8 @@
 import sys
 import string
 
+from joblib import dump
+
 import nltk
 from nltk.tokenize import word_tokenize
 from nltk.stem import WordNetLemmatizer
@@ -20,9 +22,9 @@ from sqlalchemy import create_engine
 nltk.download(['punkt', 'wordnet', 'averaged_perceptron_tagger'])
 
 
-def load_data(table_name, database_filepath):
+def load_data(database_filepath):
     engine = create_engine(f'sqlite:///{database_filepath}')
-    df = pd.read_sql_table(table_name, con=engine)
+    df = pd.read_sql_table('disaster_response', con=engine)
     X = df['message']
     y = df.drop(columns=['message', 'original', 'id', 'genre'])
     category_names = list(y.columns)
@@ -66,7 +68,18 @@ def evaluate_model(model, X_test, Y_test, category_names):
 
 
 def save_model(model, model_filepath):
-    pass
+    """
+    Use scikit learn joblib to save the model with its parameters.
+    This is more effiecent than normal python pickling as per the scikit
+    docs here: https://scikit-learn.org/stable/modules/model_persistence.html.
+
+    Args:
+        model(estimator): Scikit learn estimator trained model.
+        model_filepath(string/path-like object): A path to where the model is going
+            to be saved. file extention is `.joblib`.
+
+    """
+    dump(model, model_filepath)
 
 
 def main():
