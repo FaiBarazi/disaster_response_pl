@@ -1,15 +1,20 @@
 import sys
 import string
+
 import nltk
 from nltk.tokenize import word_tokenize
 from nltk.stem import WordNetLemmatizer
+
 from pandas import pd
+
 from sklearn.ensemble import RandomForestClassifier
 from sklearn.feature_extraction.text import CountVectorizer, TfidfTransformer
 from sklearn.metrics import classification_report
 from sklearn.model_selection import train_test_split
+from sklearn.model_selection import GridSearchCV
 from sklearn.multioutput import MultiOutputClassifier
 from sklearn.pipeline import Pipeline
+
 from sqlalchemy import create_engine
 
 nltk.download(['punkt', 'wordnet', 'averaged_perceptron_tagger'])
@@ -39,7 +44,13 @@ def build_model():
         ('tfidf', TfidfTransformer()),
         ('clf', MultiOutputClassifier(estimator=RandomForestClassifier()))
     ])
-    return pipeline
+    parameters = {
+        'vect__max_df': (0.5, 0.75),
+        'tfidf__use_idf': (True, False),
+    }
+
+    cv = GridSearchCV(pipeline, param_grid=parameters)
+    return cv
 
 
 def evaluate_model(model, X_test, Y_test, category_names):
