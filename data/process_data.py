@@ -38,16 +38,20 @@ def clean_data(df):
         # convert column from string to numeric
         categories[column] = pd.to_numeric(categories[column])
 
+    # replace anything greater than 1 in 'related column' by 1
+    categories['related'] = categories['related'].apply(lambda x: 1 if x > 1 else x)
     # drop the original categories column from `df`
     df.drop(columns=['categories'], inplace=True)
     df.drop_duplicates(inplace=True)
 
+    df = pd.concat([df, categories], axis=1)
+    df.dropna(subset=['message'], inplace=True)
     return df
 
 
 def save_data(df, database_filename):
     engine = create_engine(f'sqlite:///{database_filename}')
-    df.to_sql('disaster_response', engine, index=False)
+    df.to_sql('disaster_response', engine, index=False, if_exists='replace')
 
 
 def main():
