@@ -6,8 +6,9 @@ from joblib import dump
 import nltk
 from nltk.tokenize import word_tokenize
 from nltk.stem import WordNetLemmatizer
+import re
 
-from pandas import pd
+import pandas as pd
 
 from sklearn.ensemble import RandomForestClassifier
 from sklearn.feature_extraction.text import CountVectorizer, TfidfTransformer
@@ -32,7 +33,7 @@ def load_data(database_filepath):
 
 
 def tokenize(text):
-    tokens = word_tokenize(text)
+    tokens = word_tokenize(re.sub(r'[^a-zA-Z0-9]', ' ', text.lower()))
     lammetizer = WordNetLemmatizer()
     cleaned_tokens = [
         lammetizer.lemmatize(tok).lower().strip().strip(string.punctuation) for tok in tokens
@@ -57,14 +58,7 @@ def build_model():
 
 def evaluate_model(model, X_test, Y_test, category_names):
     y_hat = model.predict(X_test)
-
-    for i, clmn in enumerate(category_names):
-        print(
-            classification_report(
-                Y_test.iloc[:, i].values, y_hat[:, i],
-                target_names=[clmn]
-                )
-            )
+    print(classification_report(Y_test.values, y_hat, target_names=category_names))
 
 
 def save_model(model, model_filepath):
