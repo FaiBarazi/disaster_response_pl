@@ -16,6 +16,15 @@ app = Flask(__name__)
 
 
 def tokenize(text):
+    """
+    Tokenizes input text.
+
+    Args:
+        text(str): text to be tokenized.
+
+    Returns:
+        clean_tokens(list): list of words , tokens.
+    """
     tokens = word_tokenize(text)
     lemmatizer = WordNetLemmatizer()
 
@@ -39,6 +48,7 @@ model = joblib.load("../models/classifier.joblib")
 @app.route('/')
 @app.route('/index')
 def index():
+    """Handler of the index/ landing page url. """
 
     # extract data needed for visuals
     genre_counts = df.groupby('genre').count()['message']
@@ -100,6 +110,10 @@ def index():
 # web page that handles user query and displays model results
 @app.route('/go')
 def go():
+    """
+    Handler of the query.
+    This is the route when clicking on the routing button.
+    """
     # save user input in query
     query = request.args.get('query', '')
 
