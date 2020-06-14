@@ -24,6 +24,18 @@ nltk.download(['punkt', 'wordnet', 'averaged_perceptron_tagger'])
 
 
 def load_data(database_filepath):
+    """
+    Loads the dataset from an sqlite db and splits it into
+    features and labels.
+
+    Args:
+        database_filepath(str): Path to sqlite file.
+
+    Returns:
+        X (Dataframe): Dataframe of features, messages in this case.
+        y (Dataframe): Dataframe of labels one-hot encoded.
+        category_names(list): list of all the categories/columns in y.
+    """
     engine = create_engine(f'sqlite:///{database_filepath}')
     df = pd.read_sql_table('disaster_response', con=engine)
     X = df['message']
@@ -33,6 +45,18 @@ def load_data(database_filepath):
 
 
 def tokenize(text):
+    """
+    Tokenizes and lemmatizes the text. Tokenization splits the text into
+    separate words. Lemmatization converts the words into their dicitonary
+    form.
+
+    Args:
+        text(str): The text to tokenize.
+
+    Returns:
+        cleaned_tokens(List): text tokenized and lemmatized into a list of
+        words.
+    """
     tokens = word_tokenize(re.sub(r'[^a-zA-Z0-9]', ' ', text.lower()))
     lammetizer = WordNetLemmatizer()
     cleaned_tokens = [
@@ -42,6 +66,10 @@ def tokenize(text):
 
 
 def build_model():
+    """
+    Runs a model pipeline with a multioutput classifier
+    and does a gridsearch to optimize the hyperparameters.
+    """
     pipeline = Pipeline([
         ('vect', CountVectorizer(tokenizer=tokenize)),
         ('tfidf', TfidfTransformer()),
@@ -57,6 +85,20 @@ def build_model():
 
 
 def evaluate_model(model, X_test, Y_test, category_names):
+    """
+    calculates and displays the f-score precision and recall of
+    the model.
+
+    Args:
+        model(scikitlearn model): multiouput trained model .
+        X_test(Dataframe): Pandas dataframe of test features.
+        Y_test(DataFrame): pandas dataframe of test labels.
+        category_names(list): list of category names to predict.
+
+    Returns:
+        Void
+
+    """
     y_hat = model.predict(X_test)
     print(classification_report(Y_test.values, y_hat, target_names=category_names))
 
@@ -71,6 +113,9 @@ def save_model(model, model_filepath):
         model(estimator): Scikit learn estimator trained model.
         model_filepath(string/path-like object): A path to where the model is going
             to be saved. file extention is `.joblib`.
+
+    Returns:
+        void, dumps a joblib pickled file based on the model_filepath.
 
     """
     dump(model, model_filepath)
