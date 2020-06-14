@@ -7,6 +7,12 @@ def load_data(messages_filepath, categories_filepath):
     """
     Load the data from csv files and return a DataFrame
     of the two  merged on id.
+    Args:
+        messages_filepath(str): csv file of messages
+        categories_filepaht(str): csv file of categories
+
+    return:
+        void
     """
     messages = pd.read_csv(messages_filepath)
     categories = pd.read_csv(categories_filepath)
@@ -18,6 +24,11 @@ def clean_data(df):
     """
     Gets a DataFrame from the load_data output
     and cleans it furhter.
+    Args:
+        df(Dataframe): Pandas Dataframe
+
+    Returns:
+        df after being transformed and cleaned.
     """
     # create a dataframe of the 36 individual category columns
     categories = df['categories'].str.split(';', expand=True)
@@ -50,6 +61,16 @@ def clean_data(df):
 
 
 def save_data(df, database_filename):
+    """
+    Saves the data frame to an sqlite dataframe.
+
+    Args:
+        df(Dataframe): Pandas dataframe.
+        database_filename(str): path to sqlite path.
+
+    Returns:
+        void
+    """
     engine = create_engine(f'sqlite:///{database_filename}')
     df.to_sql('disaster_response', engine, index=False, if_exists='replace')
 
